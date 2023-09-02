@@ -15,7 +15,7 @@
                     </div>
                     <!-- /.card-header -->
                     <!-- form start -->
-                    <form id="category_form" enctype="multipart/form-data">
+                    <form id="category_form" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method("PUT")
                           
@@ -70,62 +70,62 @@
                         let category_name = $('#inputCategory').val()
                         let old_image = $('#old_image').val()
                         let new_iamge = $('#inputFile')[0].files[0]
-
+                        let image = btoa(new_iamge);
                         
                         // console.log(id, category_name, old_image,new_iamge)
 
                         // Ajax request
-                        $.ajax({ 
-                            url: "{{ route('admin.categories.update', '') }}" + '/' + id,
-                            method: "PUT",
-                            data: {
-                                id: id,
-                                category_name: category_name,
-                                old_image: old_image,
-                                new_iamge: new_iamge,
-                                _token: "{{ csrf_token() }}",
-                            },
-                            success: function(response){    
-                                console.log(response);
-                            },
-                            error: function(error){
-                                console.log(error);
-                            }
+                        // $.ajax({ 
+                        //     url: "{{ route('admin.categories.update', '') }}" + '/' + id,
+                        //     method: "PUT",
+                        //     data: {
+                        //         id: id,
+                        //         category_name: category_name,
+                        //         old_image: old_image,
+                        //         image: image,
+                        //         _token: "{{ csrf_token() }}",
+                        //     },
+                        //     success: function(response){    
+                        //         console.log(response);
+                        //     },
+                        //     error: function(error){
+                        //         console.log(error);
+                        //     }
 
-                         })
+                        //  })
 
                         // Axios Request
-                        // axios.put('{{ route('admin.categories.update', '') }}' + '/' + id, {
-                        //     id: id,
-                        //     category_name: $('#inputCategory').val(),
-                        //     image: $('#inputFile')[0].files[0],
-                        //     old_image: $('#old_image').val(),
-                        // }, {
-                        //     headers: {
-                        //         'Content-Type': 'multipart/form-data',
-                        //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        //     }
-                        // })
+                        axios.put("{{ route('admin.categories.update', '') }}" + '/' + id, {
+                            id: id,
+                            category_name: category_name,
+                            //image: $('#inputFile')[0].files[0],
+                            old_image: old_image,
+                        }, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                        })
                     
-                        // .then(function (response) {
-                        //     console.log(response);
-                        //     // if(response.status === 200 && response.statusText === 'OK' ){
-                        //     //     toastr.success(response.data.message);
-                        //     //     $('#inputCategory').val('');
-                        //     //     $('#error-message').text('');
-                        //     // }                        
-                        // })
-                        // .catch(function (error) {
-                        //     console.log(error);
-                        //     // if(error.response.data.errors){
-                        //     //     $('#error-message').text(error.response.data.errors.category_name[0]);
-                        //     // }
-                        //     // if(error.response.data.errors){
-                        //     //     $.each(error.response.data.errors, function(key, value){
-                        //     //         $('#error-' + key).html(value);
-                        //     //     }); 
-                        //     // }
-                        // });
+                        .then(function (response) {
+                            console.log(response);
+                            // if(response.status === 200 && response.statusText === 'OK' ){
+                            //     toastr.success(response.data.message);
+                            //     $('#inputCategory').val('');
+                            //     $('#error-message').text('');
+                            // }                        
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                            // if(error.response.data.errors){
+                            //     $('#error-message').text(error.response.data.errors.category_name[0]);
+                            // }
+                            // if(error.response.data.errors){
+                            //     $.each(error.response.data.errors, function(key, value){
+                            //         $('#error-' + key).html(value);
+                            //     }); 
+                            // }
+                        });
                     })
                 }
                 create()

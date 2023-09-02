@@ -52,7 +52,6 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         // Validation Category Fields
-        dd($request->all());
         $request->validate([
             'category_name' => 'required|unique:categories|max:32',
             'image'         => 'required|image|mimes:png,jpg,jpeg|max:1024',
@@ -107,32 +106,36 @@ class CategoryController extends Controller
 
         // dd($request->all());
         // Validation Category Fields
-        $request->validate([
-            'category_name' => 'required|max:32|unique:categories,name,' . $category->id,
-            'image'         => 'image|mimes:png,jpg,jpeg|max:1024',
-        ]);
+        // $request->validate([
+        //     'category_name' => 'required|max:32|unique:categories,name,' . $category->id,
+        //     'image'         => 'image|mimes:png,jpg,jpeg|max:1024',
+        // ]);
 
 
-        $category = Category::findOrFail($category->id);
-        $category->name = $request->category_name;
-        if ($request->hasFile('image')) {
-            $categoryImage = $request->image;
-            $categoryIcon = time() . '.' . $categoryImage->getClientOriginalExtension();
+        dd($request->all());
 
-            $image_path = public_path('files/category/' . $request->old_image);
-            if (File::exists($image_path)) {
-                File::delete($image_path);
-            }
-            Image::make($categoryImage)->resize(100, 100)->save(public_path('files/category/') . $categoryIcon);
-            $category->icon = $categoryIcon;
-        } else {
-            $category->icon = $category->icon;
-        }
 
-        $category->save();
-        $notification = $this->notification('Category update successfully.', 'success');
-        // return response()->json($notification);
-        return redirect()->back()->with($notification);
+
+        // $category = Category::findOrFail($category->id);
+        // $category->name = $request->category_name;
+        // if ($request->image) {
+        //     $categoryImage = $request->image;
+        //     $categoryIcon = time() . '.' . $categoryImage->getClientOriginalExtension();
+
+        //     $image_path = public_path('files/category/' . $request->old_image);
+        //     if (File::exists($image_path)) {
+        //         File::delete($image_path);
+        //     }
+        //     Image::make($categoryImage)->resize(100, 100)->save(public_path('files/category/') . $categoryIcon);
+        //     $category->icon = $categoryIcon;
+        // } else {
+        //     $category->icon = $category->icon;
+        // }
+
+        // $category->save();
+        // $notification = $this->notification('Category update successfully.', 'success');
+        // // return response()->json($notification);
+        // return redirect()->back()->with($notification);
     }
 
     /**
