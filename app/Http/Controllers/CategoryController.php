@@ -52,6 +52,7 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         // Validation Category Fields
+        dd($request->all());
         $request->validate([
             'category_name' => 'required|unique:categories|max:32',
             'image'         => 'required|image|mimes:png,jpg,jpeg|max:1024',
