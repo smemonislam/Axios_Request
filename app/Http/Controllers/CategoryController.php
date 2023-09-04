@@ -29,7 +29,7 @@ class CategoryController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     $actionbtn = '<a href="javascript:void(0)" data-id="' . $row->id . '" data-toggle="modal" data-target="#editCategoryModal"  class="btn btn-sm btn-primary edit"><i class="fas fa-edit"></i></a>';
-                    $actionbtn .= '<a href="' . route('admin.categories.destroy', $row->id) . '" class="btn btn-sm btn-danger ml-2" id="delete"><i class="fas fa-trash"></i></a>';
+                    $actionbtn .= '<a href="javascript:void(0)" class="btn btn-sm btn-danger ml-2" data-id="' . $row->id . '" id="delete"><i class="fas fa-trash"></i></a>';
                     return $actionbtn;
                 })
                 ->setRowId(function ($user) {
@@ -127,6 +127,12 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+
+        $category = Category::findOrFail($category->id);
+        if ($category) {
+            $category->delete();
+            $notification = $this->notification('Category Delete successfully.', 'success');
+            return response()->json($notification);
+        }
     }
 }

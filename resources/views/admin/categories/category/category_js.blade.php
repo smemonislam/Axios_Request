@@ -79,13 +79,6 @@
                 function update(){
                     $('#updateCategoryForm').on('submit', function(e){
                         const formData = new FormData(this);
-
-                        $.ajaxSetup({
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            }
-                        });        
-
                         e.preventDefault();
                         const id = $('#inputCategoryId').val();
 
@@ -113,8 +106,39 @@
                     })
                 }
                 update()
+
+                function deleteCategory(){
+                    $('body').on('click', '#delete', function(){                       
+                        const id = $(this).data('id');
+
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {  
+                                axios.delete("{{ route('admin.categories.destroy', '') }}" + '/' + id, {
+                                    id:id,
+                                    _token: "{{ csrf_token() }}"
+                                })
+                                .then(function(response){
+                                    table.draw();
+                                    Swal.fire(
+                                        'Deleted!',
+                                        'Category has been deleted.',
+                                        'success'
+                                    )
+                                })
+                            }
+                        })
+                    })
+                }
+                deleteCategory()
             });
-          
         </script>
     @endpush
 @endonce
