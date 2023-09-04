@@ -15,14 +15,20 @@ class Category extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['name', 'slug', 'home', 'icon'];
+    protected $fillable = ['category_name', 'slug', 'home', 'image'];
 
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($category) {
-            $slug = Str::slug($category->name);
+            $slug = Str::slug($category->category_name);
+            $count = Category::whereRaw("slug RLIKE '^{$slug}(-[0-9]+)?$'")->count();
+            $category->slug = $count ? "{$slug}-{$count}" : $slug;
+        });
+
+        static::updating(function ($category) {
+            $slug = Str::slug($category->category_name);
             $count = Category::whereRaw("slug RLIKE '^{$slug}(-[0-9]+)?$'")->count();
             $category->slug = $count ? "{$slug}-{$count}" : $slug;
         });

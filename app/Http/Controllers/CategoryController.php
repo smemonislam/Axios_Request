@@ -24,15 +24,18 @@ class CategoryController extends Controller
             $model = Category::query();
             return DataTables::of($model)
                 ->addIndexColumn()
+                ->addColumn('image', function ($row) {
+                    return '<img src="' . asset('files/category/' . $row->image) . '" class="img-fluid" alt="Not Found!"/>';
+                })
                 ->addColumn('action', function ($row) {
-                    $actionbtn = '<a href="' . route('admin.categories.edit', $row->id) . '"  class="btn btn-sm btn-primary edit"><i class="fas fa-edit"></i></a>';
+                    $actionbtn = '<a href="javascript:void(0)" data-id="' . $row->id . '" data-toggle="modal" data-target="#editCategoryModal"  class="btn btn-sm btn-primary edit"><i class="fas fa-edit"></i></a>';
                     $actionbtn .= '<a href="' . route('admin.categories.destroy', $row->id) . '" class="btn btn-sm btn-danger ml-2" id="delete"><i class="fas fa-trash"></i></a>';
                     return $actionbtn;
                 })
                 ->setRowId(function ($user) {
                     return $user->id;
                 })
-                ->rawColumns(['action'])
+                ->rawColumns(['image', 'action'])
                 ->make(true);
         }
         return view('admin.categories.category.index');
@@ -49,25 +52,19 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCategoryRequest $request)
     {
-        // Validation Category Fields
-        $request->validate([
-            'category_name' => 'required|unique:categories|max:32',
-            'image'         => 'required|image|mimes:png,jpg,jpeg|max:1024',
-        ]);
-
         // Image Fields Upload folder files/category
         if ($request->hasFile('image')) {
             $categoryImage = $request->image;
             $categoryIcon = time() . '.' . $categoryImage->getClientOriginalExtension();
-            Image::make($categoryImage)->resize(100, 100)->save(public_path('files/category/') . $categoryIcon);
+            Image::make($categoryImage)->resize(50, 50)->save(public_path('files/category/') . $categoryIcon);
         }
 
         // data is saved
         $data = [
-            'name'    => $request->category_name,
-            'icon'    => $categoryIcon
+            'category_name'    => $request->category_name,
+            'image'    => $categoryIcon
         ];
 
         try {
@@ -95,47 +92,34 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        return view('admin.categories.category.edit', compact('category'));
+        return response()->json($category);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Category $category)
+    public function update(UpdateCategoryRequest $request, Category $category)
     {
 
-        // dd($request->all());
-        // Validation Category Fields
-        // $request->validate([
-        //     'category_name' => 'required|max:32|unique:categories,name,' . $category->id,
-        //     'image'         => 'image|mimes:png,jpg,jpeg|max:1024',
-        // ]);
+        $category = Category::findOrFail($category->id);
+        $category->category_name = $request->category_name;
+        if ($request->image) {
+            $categoryImage = $request->image;
+            $categoryIcon = time() . '.' . $categoryImage->getClientOriginalExtension();
 
+            $image_path = public_path('files/category/' . $request->old_image);
+            if (File::exists($image_path)) {
+                File::delete($image_path);
+            }
+            Image::make($categoryImage)->resize(50, 50)->save(public_path('files/category/') . $categoryIcon);
+            $category->image = $categoryIcon;
+        } else {
+            $category->image = $category->image;
+        }
 
-        dd($request->all());
-
-
-
-        // $category = Category::findOrFail($category->id);
-        // $category->name = $request->category_name;
-        // if ($request->image) {
-        //     $categoryImage = $request->image;
-        //     $categoryIcon = time() . '.' . $categoryImage->getClientOriginalExtension();
-
-        //     $image_path = public_path('files/category/' . $request->old_image);
-        //     if (File::exists($image_path)) {
-        //         File::delete($image_path);
-        //     }
-        //     Image::make($categoryImage)->resize(100, 100)->save(public_path('files/category/') . $categoryIcon);
-        //     $category->icon = $categoryIcon;
-        // } else {
-        //     $category->icon = $category->icon;
-        // }
-
-        // $category->save();
-        // $notification = $this->notification('Category update successfully.', 'success');
-        // // return response()->json($notification);
-        // return redirect()->back()->with($notification);
+        $category->save();
+        $notification = $this->notification('Category update successfully.', 'success');
+        return response()->json($notification);
     }
 
     /**
