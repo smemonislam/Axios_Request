@@ -75,7 +75,7 @@
                 }
                 edit()
 
-                // Update category
+                // Update a category
                 function update(){
                     $('#updateCategoryForm').on('submit', function(e){
                         const formData = new FormData(this);
@@ -107,6 +107,7 @@
                 }
                 update()
 
+                // Delete a Category
                 function deleteCategory(){
                     $('body').on('click', '#delete', function(){                       
                         const id = $(this).data('id');
