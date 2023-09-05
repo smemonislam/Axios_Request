@@ -1,9 +1,7 @@
 @once
     @push('scripts')
         <script type="text/javascript">
-            $(document).ready(function() {               
-               
-
+            $(document).ready(function() {      
                 // Retrieved All Category data
                 var table = $('#ydatatable').DataTable({
                     processing: true,
@@ -13,7 +11,7 @@
                         {data: 'id', name: 'id'},
                         { data: 'category_name', name: 'category_name'},
                         { data: 'slug', name: 'slug'},
-                        // { data: 'home', name: 'home'},
+                        { data: 'home', name: 'home'},
                         { data: 'image', name: 'image', orderable:false, searchable:true },
                         { data: 'action', name: 'action', orderable:false, searchable:false},               
                     ]
@@ -139,6 +137,72 @@
                     })
                 }
                 deleteCategory()
+
+
+                function homeActive(){
+                    $('body').on('click', '#homeActive', function(){                       
+                        const id = $(this).data('id');
+                    
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, active it!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {  
+                                axios.get("{{ route('admin.home.active', '') }}" + '/' + id, {
+                                    id:id,
+                                    _token: "{{ csrf_token() }}"
+                                })
+                               .then(function(response){
+                                    table.draw();
+                                    Swal.fire(
+                                        'Updated!',
+                                        'Category has been updated.',
+                                       'success'
+                                    )
+                                })
+                            }
+                        })
+                    })
+                }
+
+                homeActive()
+
+                function homeDective(){
+                    $('body').on('click', '#homeDeactive', function(){                       
+                        const id = $(this).data('id');
+                    
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, deactive it!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {  
+                                axios.get("{{ route('admin.home.deactive', '') }}" + '/' + id, {
+                                    id:id,
+                                    _token: "{{ csrf_token() }}"
+                                })
+                               .then(function(response){
+                                    table.draw();
+                                    Swal.fire(
+                                        'Updated!',
+                                        'Category has been updated.',
+                                       'success'
+                                    )
+                                })
+                            }
+                        })
+                    })
+                }
+                homeDective()
             });
         </script>
     @endpush

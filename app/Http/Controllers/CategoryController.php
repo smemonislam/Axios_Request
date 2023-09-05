@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Models\Category;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Contracts\View\View;
@@ -32,10 +31,20 @@ class CategoryController extends Controller
                     $actionbtn .= '<a href="javascript:void(0)" class="btn btn-sm btn-danger ml-2" data-id="' . $row->id . '" id="delete"><i class="fas fa-trash"></i></a>';
                     return $actionbtn;
                 })
-                ->setRowId(function ($user) {
-                    return $user->id;
+                ->editColumn('home', function ($row) {
+                    if ($row->home == 1) {
+                        return '<a href="javascript:void(0)" data-id="' . $row->id . '" id="homeDeactive">
+                        <i class="fas fa-thumbs-down text-danger">
+                        </i> <span class="badge badge-success">Active</span>
+                        </a>';
+                    } else {
+                        return '<a href="javascript:void(0)" data-id="' . $row->id . '" id="homeActive">
+                        <i class="fas fa-thumbs-up text-success"></i> 
+                        <span class="badge badge-danger">Deactive</span>
+                        </a>';
+                    }
                 })
-                ->rawColumns(['image', 'action'])
+                ->rawColumns(['image', 'action', 'home'])
                 ->make(true);
         }
         return view('admin.categories.category.index');
@@ -127,11 +136,33 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-
         $category = Category::findOrFail($category->id);
         if ($category) {
             $category->delete();
             $notification = $this->notification('Category Delete successfully.', 'success');
+            return response()->json($notification);
+        }
+    }
+
+
+    public function homeActive($id)
+    {
+        $category = Category::findOrFail($id);
+        if ($category) {
+            $category->home = 1;
+            $category->save();
+            $notification = $this->notification('Category Active successfully.', 'info');
+            return response()->json($notification);
+        }
+    }
+
+    public function homeDeactive($category)
+    {
+        $category = Category::findOrFail($category);
+        if ($category) {
+            $category->home = 0;
+            $category->save();
+            $notification = $this->notification('Category Deactive successfully.', 'info');
             return response()->json($notification);
         }
     }

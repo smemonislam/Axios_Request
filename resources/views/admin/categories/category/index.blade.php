@@ -26,7 +26,7 @@
                 <th>SL No</th>
                 <th>Category Name</th>
                 <th>Category Slug</th>
-                {{-- <th>Home</th> --}}
+                <th>Home</th>
                 <th>Logo</th>
                 <th>Action</th>
               </tr>
